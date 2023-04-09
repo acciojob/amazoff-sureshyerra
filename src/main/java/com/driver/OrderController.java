@@ -23,6 +23,9 @@ public class OrderController {
 OrderService orderService;
     @PostMapping("/add-order")
     public ResponseEntity<String> addOrder(@RequestBody Order order){
+        if(order == null){
+            return null;
+        }
         orderService.addorder(order);
 
 
@@ -31,6 +34,7 @@ OrderService orderService;
 
     @PostMapping("/add-partner/{partnerId}")
     public ResponseEntity<String> addPartner(@PathVariable String partnerId){
+
         orderService.addpartner(partnerId);
 
         return new ResponseEntity<>("New delivery partner added successfully", HttpStatus.CREATED);
