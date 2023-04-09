@@ -23,9 +23,7 @@ public class OrderController {
 OrderService orderService;
     @PostMapping("/add-order")
     public ResponseEntity<String> addOrder(@RequestBody Order order){
-        if(order == null){
-            return null;
-        }
+
         orderService.addorder(order);
 
 

@@ -17,6 +17,9 @@ public class OrderRepository {
 
     public void addOrder(Order order){
         String name = order.getId();
+        if(name == null){
+            return;
+        }
         orderMap.put(name,order);
         return;
     }
