@@ -10,6 +10,9 @@ public class OrderService {
     @Autowired
     OrderRepository orderRepository;
     public void addorder(Order order){
+        if(order == null){
+            return;
+        }
         orderRepository.addOrder(order);
         return;
     }

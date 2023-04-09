@@ -16,10 +16,11 @@ public class OrderRepository {
 
 
     public void addOrder(Order order){
-        String name = order.getId();
-        if(name == null){
+        if (order == null){
             return;
         }
+        String name = order.getId();
+
         orderMap.put(name,order);
         return;
     }
