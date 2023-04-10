@@ -12,7 +12,7 @@ public class OrderRepository {
     HashMap<String,Order> orderMap = new HashMap<>();
     HashMap<String,DeliveryPartner> PartnerMap = new HashMap<>();
     HashMap<String,String> orderToPartnerMap = new HashMap<>();
-    HashMap<String, HashSet<String>> partnerToOrderMap= new HashMap<>();
+    HashMap<String, List<String>> partnerToOrderMap= new HashMap<>();
 
 
     public void addOrder(Order order){
@@ -27,7 +27,7 @@ public class OrderRepository {
 
     }
     public void addordertopartner(String orderid,String partnerid){
-        HashSet<String> orders = new HashSet<>();
+        List<String> orders = new ArrayList<>();
         if (orderMap.containsKey(orderid) && PartnerMap.containsKey(partnerid)) {
             orderToPartnerMap.put(orderid, partnerid);
             if (partnerToOrderMap.containsKey(partnerid)) {
@@ -59,27 +59,26 @@ public class OrderRepository {
     }
     public DeliveryPartner getpartnerbyid(String partnerid){
         if(PartnerMap.containsKey(partnerid)){
-            DeliveryPartner partner = PartnerMap.get(partnerid);
-            return partner;
+            return  PartnerMap.get(partnerid);
         }
         else {
             return null;
         }
 
     }
-    public Integer getcountbypartnerid(String partnerid){
-        if(PartnerMap.containsKey(partnerid)){
-           Integer cnt = PartnerMap.get(partnerid).getNumberOfOrders();
+    public int getcountbypartnerid(String partnerid){
+        if(partnerToOrderMap.containsKey(partnerid)){
+           int cnt = partnerToOrderMap.get(partnerid).size();
            return cnt;
         }
         return 0;
     }
     public List<String> getordersbypartnerid(String partnerid){
-        HashSet<String> orderlist = new HashSet<>();
+        List<String> orderlist = new ArrayList<>();
         if(partnerToOrderMap.containsKey(partnerid)) {
             orderlist = partnerToOrderMap.get(partnerid);
         }
-        return new ArrayList<>(orderlist);
+        return orderlist;
     }
     public List<String> getallorders(){
         List<String> ans = new ArrayList<>();
@@ -89,8 +88,8 @@ public class OrderRepository {
         return ans;
 
     }
-    public Integer getcount(){
-        return orderMap.size()-orderToPartnerMap.size();
+    public int getcount(){
+        return orderMap.size() - orderToPartnerMap.size();
     }
     public Integer countofordersleftaftergiventime(String time,String partnerid){
         int cnt = 0;
@@ -99,12 +98,12 @@ public class OrderRepository {
         int giventime = hour*60+min;
 
         if(partnerToOrderMap.containsKey(partnerid)){
-            HashSet<String> t = partnerToOrderMap.get(partnerid);
+            List<String> t = partnerToOrderMap.get(partnerid);
             for( String orderid : t){
                 if (orderMap.containsKey(orderid)){
                     Order order = orderMap.get(orderid);
                     if (order.getDeliveryTime() > giventime){
-                        cnt += 1;
+                        cnt ++;
                     }
                 }
             }
@@ -114,9 +113,9 @@ public class OrderRepository {
     public void deletepartnerbyid(String partnerid){
 
         if(partnerToOrderMap.containsKey(partnerid)){
-            HashSet<String> orders = partnerToOrderMap.get(partnerid);
+            List<String> orders = partnerToOrderMap.get(partnerid);
             for(String s : orders){
-                if(orderToPartnerMap.containsKey(orders)){
+                if(orderToPartnerMap.containsKey(s)){
                     orderToPartnerMap.remove(s);
                 }
 
@@ -133,7 +132,7 @@ public class OrderRepository {
 
         if(orderToPartnerMap.containsKey(orderid)){
             String partnerid = orderToPartnerMap.get(orderid);
-            HashSet<String> orders = partnerToOrderMap.get(partnerid);
+            List<String> orders = partnerToOrderMap.get(partnerid);
             orders.remove(orderid);
             partnerToOrderMap.put(partnerid,orders);
 
@@ -147,21 +146,33 @@ public class OrderRepository {
     }
     public String finddelieverytimebypartnerid(String partnerid){
         Integer time  = 0;
-        if(partnerToOrderMap.containsKey(partnerid)){
-            HashSet<String> orders = partnerToOrderMap.get(partnerid);
+        if(PartnerMap.containsKey(partnerid)){
+            List<String> orders = partnerToOrderMap.get(partnerid);
             for (String s : orders){
                 if(orderMap.containsKey(s)){
                     Order order = orderMap.get(s);
-                    time = Math.max(time,order.getDeliveryTime());
+                    if(time<order.getDeliveryTime()){
+                        time = order.getDeliveryTime();
+                    }
                 }
             }
         }
         Integer hour = time/60;
+
         Integer min = time%60;
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(hour );
+        if(hour < 10){
+            stringBuilder.append(0).append(hour);
+        }else {
+            stringBuilder.append(hour);
+        }
         stringBuilder.append(":" );
-        stringBuilder.append(min);
+        if (min < 10){
+            stringBuilder.append(0).append(min);
+        }
+        else {
+            stringBuilder.append(min);
+        }
         return stringBuilder.toString();
 
     }

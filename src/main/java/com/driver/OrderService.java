@@ -40,7 +40,7 @@ public class OrderService {
     public List<String> getallorders(){
         return orderRepository.getallorders();
     }
-    public Integer getcount(){
+    public int getcount(){
         return orderRepository.getcount();
     }
     public Integer countofordersleftaftergiventime(String time,String partnerid){

@@ -95,7 +95,7 @@ OrderService orderService = new OrderService();
 
     @GetMapping("/get-count-of-unassigned-orders")
     public ResponseEntity<Integer> getCountOfUnassignedOrders(){
-        Integer countOfOrders = orderService.getcount();
+        int countOfOrders = orderService.getcount();
 
         //Count of orders that have not been assigned to any DeliveryPartner
 
