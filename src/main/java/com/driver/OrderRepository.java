@@ -16,12 +16,9 @@ public class OrderRepository {
 
 
     public void addOrder(Order order){
-        if (order == null){
-            return;
-        }
         String name = order.getId();
 
-        orderMap.put(name,order);
+        if(name != null)orderMap.put(name,order);
         return;
     }
     public void addpartner(String partnerid){
