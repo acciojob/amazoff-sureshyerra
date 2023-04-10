@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public class OrderRepository {
     HashMap<String,Order> orderMap = new HashMap<>();
-    HashMap<String,DeliveryPartner> PartnerMap = new HashMap<>();
+    HashMap<String,DeliveryPartner> partnerMap = new HashMap<>();
     HashMap<String,String> orderToPartnerMap = new HashMap<>();
     HashMap<String, List<String>> partnerToOrderMap= new HashMap<>();
 
@@ -23,47 +23,34 @@ public class OrderRepository {
     }
     public void addpartner(String partnerid){
             DeliveryPartner partner = new DeliveryPartner(partnerid);
-            PartnerMap.put(partner.getId(),partner);
+            partnerMap.put(partner.getId(),partner);
 
     }
     public void addordertopartner(String orderid,String partnerid){
-        List<String> orders = new ArrayList<>();
-        if (orderMap.containsKey(orderid) && PartnerMap.containsKey(partnerid)) {
-            orderToPartnerMap.put(orderid, partnerid);
-            if (partnerToOrderMap.containsKey(partnerid)) {
-                orders = partnerToOrderMap.get(partnerid);
-
-                orders.add(orderid);
-                partnerToOrderMap.put(partnerid, orders);
-
-            } else {
-                partnerToOrderMap.put(partnerid, orders);
-            }
-        }
-        DeliveryPartner partner = PartnerMap.get(partnerid);
-        partner.setNumberOfOrders(orders.size());
-
-        orderToPartnerMap.put(orderid,partnerid);
-
+        List<String> list = partnerToOrderMap.getOrDefault(partnerid, new ArrayList<>());
+        list.add(orderid);
+        partnerToOrderMap.put(partnerid, list);
+        orderToPartnerMap.put(orderid, partnerid);
+        DeliveryPartner partner = partnerMap.get(partnerid);
+        partner.setNumberOfOrders(list.size());
 
     }
     public Order getorderbyid(String orderid){
-        if(orderMap.containsKey(orderid)){
-            Order order = orderMap.get(orderid);
-            return order;
+        for (String id : orderMap.keySet()){
+            if (id.equals(orderid)){
+                return orderMap.get(id);
+            }
         }
-        else {
-            return null;
-        }
+        return null;
 
     }
     public DeliveryPartner getpartnerbyid(String partnerid){
-        if(PartnerMap.containsKey(partnerid)){
-            return  PartnerMap.get(partnerid);
-        }
-        else {
-            return null;
-        }
+       for (String id : partnerMap.keySet()){
+           if (id.equals(partnerid)){
+               return partnerMap.get(id);
+           }
+       }
+       return null;
 
     }
     public int getcountbypartnerid(String partnerid){
@@ -71,7 +58,9 @@ public class OrderRepository {
            int cnt = partnerToOrderMap.get(partnerid).size();
            return cnt;
         }
-        return 0;
+        else {
+            return 0;
+        }
     }
     public List<String> getordersbypartnerid(String partnerid){
         List<String> orderlist = new ArrayList<>();
@@ -122,8 +111,8 @@ public class OrderRepository {
             }
             partnerToOrderMap.remove(partnerid);
         }
-        if (PartnerMap.containsKey(partnerid)){
-            PartnerMap.remove(partnerid);
+        if (partnerMap.containsKey(partnerid)){
+            partnerMap.remove(partnerid);
         }
 
     }
@@ -136,7 +125,7 @@ public class OrderRepository {
             orders.remove(orderid);
             partnerToOrderMap.put(partnerid,orders);
 
-            DeliveryPartner partner = PartnerMap.get(partnerid);
+            DeliveryPartner partner = partnerMap.get(partnerid);
             partner.setNumberOfOrders(orders.size());
         }
         if (orderMap.containsKey(orderid)){
@@ -146,7 +135,7 @@ public class OrderRepository {
     }
     public String finddelieverytimebypartnerid(String partnerid){
         Integer time  = 0;
-        if(PartnerMap.containsKey(partnerid)){
+        if(partnerMap.containsKey(partnerid)){
             List<String> orders = partnerToOrderMap.get(partnerid);
             for (String s : orders){
                 if(orderMap.containsKey(s)){
